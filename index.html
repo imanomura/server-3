@@ -7,24 +7,26 @@
     <script src="https://unpkg.com/petite-vue" defer init></script>
   </head>
 
-  <body v-scope="dataset()">
+  <!-- <body v-scope="dataset()"> -->
+  <body>
     <p>
       <input type="file" accept=".png, .jpg, .jpeg" />
       <figure><img height="200" /></figure>
       <!-- プレビュー用（JSONのみ） -->
     </p>
     <p>
-      <button @click="fetchData">データ取得</button>
+      <button>データ取得</button>
     </p>
   </body>
 
   <script>
     const reader = new FileReader();
 
-    reader.addEventListener('load', () => {
-      document.querySelector('img').src = reader.result;
-      // this.data = reader.result;
-    });
+    // reader.addEventListener('load', () => {
+    //   document.querySelector('img').src = reader.result;
+    //   // this.data = reader.result;
+    // });
+
     let file = false;
     const input = document.querySelector('input');
     input.addEventListener('change', () => {
@@ -38,41 +40,44 @@
       image = reader.result; // 画像データの取得
       document.querySelector('img').src = image; // プレビューを表示
     });
-    function dataset() {
-      return {
-        data: false,
 
-        async fetchData() {
-          const file = document.querySelector('input').files[0];
-          if (!file) {
-            window.alert('ファイルを選択してください');
-            return;
-          }
+    document.querySelector('button').addEventListener('click', fetchData);
 
-          // const body = new FormData();
-          const body = {
-            filename: file.name,
-            image: image
-          };
-          // body.append('image', file, file.name);
-          const url = 'https://httpbin.org/post';
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8'
-            },
-            body: JSON.stringify(body)
-            // body: body
-          });
-          const obj = await res.json();
-          const image = obj.files.image;
-          document.querySelector('img').src = image;
-          this.data = obj;
-          console.log(JSON.stringify(this.data, null, 2));
-        }
+    // function dataset() {
+    //   return {
+    //     data: false,
 
-        // ポストで送りながらプレビューで表示させる
+    async function fetchData() {
+      // const file = document.querySelector('input').files[0];
+      if (!file) {
+        window.alert('ファイルを選択してください');
+        return;
+      }
+
+      // const body = new FormData();
+      const body = {
+        filename: file.name,
+        image: image
       };
+      // body.append('image', file, file.name);
+      const url = 'https://httpbin.org/post';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify(body)
+        // body: body
+      });
+      const obj = await res.json();
+      // const image = obj.files.image;
+      // document.querySelector('img').src = image;
+      // this.data = obj;
+      console.log(JSON.stringify(obj, null, 2));
     }
+
+    // ポストで送りながらプレビューで表示させる
+    // };
+    // }
   </script>
 </html>
