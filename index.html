@@ -19,9 +19,29 @@
   </body>
 
   <script>
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => {
+      document.querySelector('img').src = reader.result;
+      // this.data = reader.result;
+    });
+    let file = false;
+    const input = document.querySelector('input');
+    input.addEventListener('change', () => {
+      file = input.files[0]; // 画像ファイル情報の取得
+      if (file) {
+        reader.readAsDataURL(file); // 画像ファイルの読み込み → loadイベント発火
+      }
+    });
+    let image = false;
+    reader.addEventListener('load', async (e) => {
+      image = reader.result; // 画像データの取得
+      document.querySelector('img').src = image; // プレビューを表示
+    });
     function dataset() {
       return {
         data: false,
+
         async fetchData() {
           const file = document.querySelector('input').files[0];
           if (!file) {
@@ -29,12 +49,20 @@
             return;
           }
 
-          const body = new FormData();
-          body.append('image', file, file.name);
+          // const body = new FormData();
+          const body = {
+            filename: file.name,
+            image: image
+          };
+          // body.append('image', file, file.name);
           const url = 'https://httpbin.org/post';
           const res = await fetch(url, {
-            mothod: 'POST',
-            body: body
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8'
+            },
+            body: JSON.stringify(body)
+            // body: body
           });
           const obj = await res.json();
           const image = obj.files.image;
